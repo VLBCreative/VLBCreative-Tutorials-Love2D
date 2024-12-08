@@ -125,31 +125,30 @@ function love.update(dt)
 
     y = y+dy
 
-    if love.keyboard.isDown('down') then
-        yetiBody:setLinearVelocity(0,PLAYER_MOV)
-        -- py = py + PLAYER_MOV
-        yetiAnim = runningYeti
-    elseif love.keyboard.isDown('up') then
-        yetiBody:setLinearVelocity(0,-PLAYER_MOV)
-        -- py = py - PLAYER_MOV
-        yetiAnim = runningYeti
-    elseif love.keyboard.isDown('left') then
-        yetiBody:setLinearVelocity(-PLAYER_MOV,0)
+    vecX = 0
+    vecY = 0
+    yetiAnim = idleYeti
 
-        -- px = px - PLAYER_MOV
+    if love.keyboard.isDown('down') then
+        vecY = PLAYER_MOV
+        yetiAnim = runningYeti
+    end
+    if love.keyboard.isDown('up') then
+        vecY = -PLAYER_MOV
+        yetiAnim = runningYeti
+    end
+    if love.keyboard.isDown('left') then
+        vecX = -PLAYER_MOV
         yetiAnim = runningYeti
         left_direction  = true
-    elseif love.keyboard.isDown('right') then
-        yetiBody:setLinearVelocity(PLAYER_MOV,0)
-
-        -- px = px + PLAYER_MOV
+    end
+    if love.keyboard.isDown('right') then
+        vecX = PLAYER_MOV
         yetiAnim = runningYeti
         left_direction = false
-    else
-        yetiBody:setLinearVelocity(0,0)
-    
-        yetiAnim = idleYeti
     end
+        
+    yetiBody:setLinearVelocity(vecX,vecY)
 
     if py >= y and py <= y+BOX_SIZE then
         if px >= x and px <= x+BOX_SIZE then
@@ -229,22 +228,22 @@ function love.draw()
     -- love.graphics.draw()
 
 
-    -- love.graphics.setColor(0,0,0)
-    -- for _, body in pairs(world:getBodies()) do
-    --     for _, fixture in pairs(body:getFixtures()) do
-    --         local shape = fixture:getShape()
+    love.graphics.setColor(0,0,0)
+    for _, body in pairs(world:getBodies()) do
+        for _, fixture in pairs(body:getFixtures()) do
+            local shape = fixture:getShape()
     
-    --         if shape:typeOf("CircleShape") then
-    --             local cx, cy = body:getWorldPoints(shape:getPoint())
-    --             love.graphics.circle("line", cx, cy, shape:getRadius())
-    --         elseif shape:typeOf("PolygonShape") then
-    --             love.graphics.polygon("line", body:getWorldPoints(shape:getPoints()))
-    --         else
-    --             love.graphics.line(body:getWorldPoints(shape:getPoints()))
-    --         end
-    --     end
-    -- end
-    -- love.graphics.reset( )
+            if shape:typeOf("CircleShape") then
+                local cx, cy = body:getWorldPoints(shape:getPoint())
+                love.graphics.circle("line", cx, cy, shape:getRadius())
+            elseif shape:typeOf("PolygonShape") then
+                love.graphics.polygon("line", body:getWorldPoints(shape:getPoints()))
+            else
+                love.graphics.line(body:getWorldPoints(shape:getPoints()))
+            end
+        end
+    end
+    love.graphics.reset( )
 
 end
 
