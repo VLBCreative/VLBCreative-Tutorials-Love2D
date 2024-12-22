@@ -159,7 +159,7 @@ function love.update(dt)
         yetiAnim = eatingYeti
 
         timer = timer +dt
-        if timer >= 1.2 then
+        if timer >= 1.15 then
             yetiState = 1
             timer = 0
         end
