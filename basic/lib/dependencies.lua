@@ -40,6 +40,7 @@ treeXY = {}
 treeTable = {}
 treeFixture = {}
 destroyTrees = {}
+skierDestroy = {}
 
 spritesheet = love.graphics.newImage('SkiFree_-_WIN3_-_Sprite_Sheet.png')
 gFrames = {
