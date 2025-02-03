@@ -78,15 +78,35 @@ function love.update(dt)
 
   
 
-    for i,skier in  pairs(skier_table) do
-        if skier.state == 2 then
-            if love.keyboard.isDown('return') then
-                while yeti_character.state == 1 do
-                    table.remove(skier_table,i)
-                    skier.body:destroy()
+    for i,skierFlag in pairs(skierDestroy) do
+        if love.keyboard.isDown('return') then
+            while yeti_character.state == 1 do
+                skierFlag.body:destroy()
+                for j, skier in pairs(skier_table) do
+                    if skier.body:isDestroyed() then
+                        table.remove(skier_table,j)
+                    end
                     pscore = pscore + 1
                     yeti_character.state = 2
                     yeti_character:eatingFunction()
+                end
+                skierDestroy = {}
+            end
+        end
+    end
+
+    for i,skier in pairs(skier_table) do
+        if not skier.body:isDestroyed() then
+            if skier.state == 4 then
+                for j,bodies in pairs(skier.detectedBodies) do
+                    if math.abs(bodies:getY() - skier.y) < 12.5 + 30 then
+                        if bodies:getY() - skier.y < 0 then
+                            mov = SKIER_MOV
+                        else
+                            mov = -SKIER_MOV
+                        end
+                        skier.body:setLinearVelocity(SKIER_MOV,mov)
+                    end
                 end
             end
         end
@@ -163,7 +183,7 @@ function beginContact(a,b,coll)
         local skierFixture = a:getUserData()[1] == 'skier' and a or b
         for i,skier in pairs(skier_table) do
             if skier.body == skierFixture:getBody() then
-                skier.state = 2
+                table.insert(skierDestroy, skier)
             end
         end
     end
@@ -173,6 +193,17 @@ function beginContact(a,b,coll)
         for i,tree in pairs(treeTable) do
             if tree.body == treeFixture:getBody() then
                 tree.state = 2
+            end
+        end
+    end
+
+    if (types['yeti'] or types['tree']) and types['skier_sensor'] then
+        local skierFixture = a:getUserData()[1] == 'skier_sensor' and a or b
+        local otherFixture = a:getUserData()[1] ~= 'skier_sensor' and a or b
+        for i,skier in pairs(skier_table) do
+            if skier.body == skierFixture:getBody() then
+                skier.state = 4
+                table.insert(skier.detectedBodies, otherFixture:getBody())
             end
         end
     end
@@ -189,7 +220,7 @@ function endContact(a,b,coll)
         local skierFixture = a:getUserData()[1] == 'skier' and a or b
         for i,skier in pairs(skier_table) do
             if skier.body == skierFixture:getBody() then
-                skier.state = 1
+                table.remove(skierDestroy,1)
             end
         end
     end
@@ -202,6 +233,21 @@ function endContact(a,b,coll)
             end
         end
     end
+
+    if (types['yeti'] or types['tree']) and types['skier_sensor'] then
+        local skierFixture = a:getUserData()[1] == 'skier_sensor' and a or b
+        local otherFixture = a:getUserData()[1] ~= 'skier_sensor' and a or b
+        for i,skier in pairs(skier_table) do
+            if skier.body == skierFixture:getBody() then
+                for j, bodies in pairs(skier.detectedBodies) do 
+                    if otherFixture:getBody() == bodies then
+                        table.remove(skier.detectedBodies, j)
+                    end
+                end
+            end
+        end
+    end
+
 
 
 end
