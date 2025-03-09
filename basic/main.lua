@@ -27,7 +27,18 @@ function love.load()
         treeTable[i]:changeAnimation('idleTree')
     end
 
+    menu = Menu()
+
 end
+
+
+function love.mousepressed(x,y,button,istouch)
+    if button == 1 then
+        mousex = x
+        mousey = y
+    end
+end
+
 
 function love.keypressed(key)
 
@@ -41,88 +52,96 @@ function love.keypressed(key)
         skier_character:changeAnimation('skiingSkier')
         table.insert(skier_table, skier_character)
     end
+
+    if key == 'p' and pause_status then
+        pause_status = false
+    elseif key =='p' and not pause_status then
+        pause_status = true
+    end
     
 
 end
 
 function love.update(dt)
 
-    Timer.update(dt)
-    yeti_character:update(dt)
-    world:update(dt)
+    if not pause_status then
+        Timer.update(dt)
+        yeti_character:update(dt)
+        world:update(dt)
 
-    for i,tree in pairs(treeTable) do
-        tree:update(dt)
-    end
-    for i,skier in pairs(skier_table) do
-        skier:update(dt)
-    end
-
-
-    if y<= 0 then
-        dy = GRAVITY
-    elseif y>= WINDOW_HEIGHT-BOX_SIZE then
-        dy = -GRAVITY
-    end
-
-    y = y+dy
-
-   
-
-    if py >= y and py <= y+BOX_SIZE then
-        if px >= x and px <= x+BOX_SIZE then
-            px = 10
-            py = 10
+        for i,tree in pairs(treeTable) do
+            tree:update(dt)
         end
-    end
+        for i,skier in pairs(skier_table) do
+            skier:update(dt)
+        end
 
-  
 
-    for i,skierFlag in pairs(skierDestroy) do
-        if love.keyboard.isDown('return') then
-            while yeti_character.state == 1 do
-                skierFlag.body:destroy()
-                for j, skier in pairs(skier_table) do
-                    if skier.body:isDestroyed() then
-                        table.remove(skier_table,j)
-                    end
-                    pscore = pscore + 1
-                    yeti_character.state = 2
-                    yeti_character:eatingFunction()
-                end
-                skierDestroy = {}
+        if y<= 0 then
+            dy = GRAVITY
+        elseif y>= WINDOW_HEIGHT-BOX_SIZE then
+            dy = -GRAVITY
+        end
+
+        y = y+dy
+
+    
+
+        if py >= y and py <= y+BOX_SIZE then
+            if px >= x and px <= x+BOX_SIZE then
+                px = 10
+                py = 10
             end
         end
-    end
 
-    for i,skier in pairs(skier_table) do
-        if not skier.body:isDestroyed() then
-            if skier.state == 4 then
-                for j,bodies in pairs(skier.detectedBodies) do
-                    if math.abs(bodies:getY() - skier.y) < 12.5 + 30 then
-                        if bodies:getY() - skier.y < 0 then
-                            mov = SKIER_MOV
-                        else
-                            mov = -SKIER_MOV
-                        end
-                        skier.body:setLinearVelocity(SKIER_MOV,mov)
-                    end
-                end
-            end
-        end
-    end
+    
 
-
-    for i,tree in pairs(treeTable) do
-        if tree.state == 2 then
+        for i,skierFlag in pairs(skierDestroy) do
             if love.keyboard.isDown('return') then
-                tree:removal()
+                while yeti_character.state == 1 do
+                    skierFlag.body:destroy()
+                    for j, skier in pairs(skier_table) do
+                        if skier.body:isDestroyed() then
+                            table.remove(skier_table,j)
+                        end
+                        pscore = pscore + 1
+                        yeti_character.state = 2
+                        yeti_character:eatingFunction()
+                    end
+                    skierDestroy = {}
+                end
             end
-        elseif tree.state ==3 then
-            table.remove(treeTable, i)
         end
-    end
 
+        for i,skier in pairs(skier_table) do
+            if not skier.body:isDestroyed() then
+                if skier.state == 4 then
+                    for j,bodies in pairs(skier.detectedBodies) do
+                        if math.abs(bodies:getY() - skier.y) < 12.5 + 30 then
+                            if bodies:getY() - skier.y < 0 then
+                                mov = SKIER_MOV
+                            else
+                                mov = -SKIER_MOV
+                            end
+                            skier.body:setLinearVelocity(SKIER_MOV,mov)
+                        end
+                    end
+                end
+            end
+        end
+
+
+        for i,tree in pairs(treeTable) do
+            if tree.state == 2 then
+                if love.keyboard.isDown('return') then
+                    tree:removal()
+                end
+            elseif tree.state ==3 then
+                table.remove(treeTable, i)
+            end
+        end
+    
+    end
 
 
 
@@ -141,6 +160,11 @@ function love.draw()
     love.graphics.printf('2pt Area',WINDOW_WIDTH/4 -10,WINDOW_HEIGHT/2,WINDOW_WIDTH)
     love.graphics.printf('1pt Area',WINDOW_WIDTH*3/4 -10,WINDOW_HEIGHT/2,WINDOW_WIDTH)
     love.graphics.reset( )
+
+    if pause_status then
+        menu:render()
+    end
+
 
     for i,skier in pairs(skier_table) do
         skier:render()
