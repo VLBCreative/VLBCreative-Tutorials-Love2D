@@ -7,6 +7,8 @@ require 'lib/Animation'
 require 'lib/Tree'
 require 'lib/Yeti'
 require 'lib/Skier'
+require 'lib/Sign'
+require 'lib/Menu'
 
 WINDOW_HEIGHT = 800
 WINDOW_WIDTH = 800
@@ -23,6 +25,11 @@ py = WINDOW_HEIGHT/2
 px = WINDOW_WIDTH/2
 
 pscore = 0
+pause_status = false
+
+mousex = 0
+mousey = 0
+mouse = {}
 
 skierx = 0
 skiery = 200
@@ -31,6 +38,9 @@ treeTimer = 0
 
 skier_table = {}
 skier_fixture = {}
+
+signTable = {}
+yetiTable = {}
 
 contactBodies = {}
 
@@ -66,6 +76,42 @@ gFrames = {
     love.graphics.newQuad(365,227,23,28,spritesheet:getDimensions()),
     love.graphics.newQuad(341,227,23,28,spritesheet:getDimensions()),
     love.graphics.newQuad(317,227,23,28,spritesheet:getDimensions()),
-    love.graphics.newQuad(294,227,22,28,spritesheet:getDimensions())}    
+    love.graphics.newQuad(294,227,22,28,spritesheet:getDimensions())},
     
+    ['sign'] = {love.graphics.newQuad(129,102,13,25,spritesheet:getDimensions()),
+    love.graphics.newQuad(143,102,13,25,spritesheet:getDimensions())}
+    
+}
+
+panel_items = {
+
+    ['panel_1'] = {
+
+        x=15,
+        y=15,
+        image = 'tree',
+
+    },
+    ['panel_2'] = {
+
+        x=75,
+        y=15,
+        image = 'sign',
+
+    },
+    ['panel_3'] = {
+
+        x=135,
+        y=15,
+        image = 'skier',
+
+    },
+    ['panel_4'] = {
+
+        x=195,
+        y=15,
+        image = 'yeti',
+
+    },
+
 }
