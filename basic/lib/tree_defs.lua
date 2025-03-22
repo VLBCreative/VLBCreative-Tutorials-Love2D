@@ -45,6 +45,17 @@ TREE_DEFS = {
             },
         },
     },
+    ['sign'] = {
+        r = 0,
+        scalex =2,
+        scaley =2,
+        anims = {
+            ['idleSign'] = {
+                frames = {1,2},
+                interval =0.2
+            },
+        },
+    },
 
 }
 

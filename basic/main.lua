@@ -14,13 +14,18 @@ function love.load()
 
     input = {world = world, atlas = spritesheet}
 
+    input.x = WINDOW_WIDTH/2
+    input.y = WINDOW_HEIGHT/2
     yeti_character = Yeti(input)
     yeti_character:createAnimation('idleYeti')
     yeti_character:createAnimation('runningYeti')
     yeti_character:createAnimation('eatingYeti')
     yeti_character:changeAnimation('idleYeti')
+    table.insert(yetiTable, yeti_character)
 
     for i = 1,6,1 do
+        input.x = math.random(100,WINDOW_WIDTH-100)
+        input.y = math.random(100,WINDOW_HEIGHT-100)
         table.insert(treeTable,Tree(input))
         treeTable[i]:createAnimation('idleTree')
         treeTable[i]:createAnimation('burningTree')
@@ -47,6 +52,8 @@ function love.keypressed(key)
     end
 
     if key == 'space' then
+        input.x = 0
+        input.y = math.random(100,WINDOW_HEIGHT-100)
         skier_character = Skier(input)
         skier_character:createAnimation('skiingSkier')
         skier_character:changeAnimation('skiingSkier')
@@ -59,6 +66,43 @@ function love.keypressed(key)
         pause_status = true
     end
     
+    if pause_status and key == 't' and mousex <= 65 and mousex >= 15 and mousey <= 40 and mousey >= 15 then
+        input.x = mouse.x
+        input.y = mouse.y
+        new_tree = Tree(input)
+        new_tree:createAnimation('idleTree')
+        new_tree:createAnimation('burningTree')
+        new_tree:changeAnimation('idleTree')
+        table.insert(treeTable,new_tree)
+
+    elseif  pause_status and key == 't' and mousex <= 130 and mousex >= 75 and mousey <= 40 and mousey >= 15 then
+        input.x = mouse.x
+        input.y = mouse.y
+        new_sign = Sign(input)
+        new_sign:createAnimation('idleSign')
+        new_sign:changeAnimation('idleSign')
+        table.insert(signTable,new_sign)
+
+    
+    elseif  pause_status and key == 't' and mousex <= 195 and mousex >= 140 and mousey <= 40 and mousey >= 15 then
+        input.x = mouse.x
+        input.y = mouse.y
+        new_skier = Skier(input)
+        new_skier:createAnimation('skiingSkier')
+        new_skier:changeAnimation('skiingSkier')
+        table.insert(skier_table, new_skier)
+
+    elseif  pause_status and key == 't' and mousex <= 260 and mousex >= 205 and mousey <= 40 and mousey >= 15 and #yetiTable<2 then
+        input.x = mouse.x
+        input.y = mouse.y
+        new_yeti = Yeti(input)
+        new_yeti:createAnimation('idleYeti')
+        new_yeti:createAnimation('runningYeti')
+        new_yeti:createAnimation('eatingYeti')
+        new_yeti:changeAnimation('idleYeti')
+        table.insert(yetiTable, new_yeti)
+
+    end
 
 end
 
@@ -66,11 +110,18 @@ function love.update(dt)
 
     if not pause_status then
         Timer.update(dt)
-        yeti_character:update(dt)
+
         world:update(dt)
 
+
+        for i,yeti in pairs(yetiTable) do
+            yeti:update(dt)
+        end
         for i,tree in pairs(treeTable) do
             tree:update(dt)
+        end
+        for i,sign in pairs(signTable) do
+            sign:update(dt)
         end
         for i,skier in pairs(skier_table) do
             skier:update(dt)
@@ -140,6 +191,9 @@ function love.update(dt)
                 table.remove(treeTable, i)
             end
         end
+
+    else
+        mouse.x,mouse.y = love.mouse.getPosition()
     
     end
 
@@ -174,24 +228,31 @@ function love.draw()
         tree:render()
     end
 
-    yeti_character:render()
-
-    love.graphics.setColor(0,0,0)
-    for _, body in pairs(world:getBodies()) do
-        for _, fixture in pairs(body:getFixtures()) do
-            local shape = fixture:getShape()
-    
-            if shape:typeOf("CircleShape") then
-                local cx, cy = body:getWorldPoints(shape:getPoint())
-                love.graphics.circle("line", cx, cy, shape:getRadius())
-            elseif shape:typeOf("PolygonShape") then
-                love.graphics.polygon("line", body:getWorldPoints(shape:getPoints()))
-            else
-                love.graphics.line(body:getWorldPoints(shape:getPoints()))
-            end
-        end
+    for i,sign in pairs(signTable) do
+        sign:render()
     end
-    love.graphics.reset( )
+
+    for i,yeti in pairs(yetiTable) do
+        yeti:render()
+    end
+
+
+    -- love.graphics.setColor(0,0,0)
+    -- for _, body in pairs(world:getBodies()) do
+    --     for _, fixture in pairs(body:getFixtures()) do
+    --         local shape = fixture:getShape()
+    
+    --         if shape:typeOf("CircleShape") then
+    --             local cx, cy = body:getWorldPoints(shape:getPoint())
+    --             love.graphics.circle("line", cx, cy, shape:getRadius())
+    --         elseif shape:typeOf("PolygonShape") then
+    --             love.graphics.polygon("line", body:getWorldPoints(shape:getPoints()))
+    --         else
+    --             love.graphics.line(body:getWorldPoints(shape:getPoints()))
+    --         end
+    --     end
+    -- end
+    -- love.graphics.reset( )
 
 end
 

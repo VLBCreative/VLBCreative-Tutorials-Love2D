@@ -7,6 +7,7 @@ require 'lib/Animation'
 require 'lib/Tree'
 require 'lib/Yeti'
 require 'lib/Skier'
+require 'lib/Sign'
 require 'lib/Menu'
 
 WINDOW_HEIGHT = 800
@@ -28,6 +29,7 @@ pause_status = false
 
 mousex = 0
 mousey = 0
+mouse = {}
 
 skierx = 0
 skiery = 200
@@ -36,6 +38,9 @@ treeTimer = 0
 
 skier_table = {}
 skier_fixture = {}
+
+signTable = {}
+yetiTable = {}
 
 contactBodies = {}
 
